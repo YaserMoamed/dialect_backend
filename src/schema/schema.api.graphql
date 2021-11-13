@@ -1,0 +1,161 @@
+schema {
+ query: Query
+ mutation: Mutation
+ }
+
+
+ type Query {
+  getImageUploadUrl(extension: String, contentType: String): AWSURL!
+ 
+  getMyTimeLime(limit: Int!, nextToken:String) : QuestionsPage! 
+  
+  getMyProfile: MyProfile!
+
+  getProfile(screenName: String!): OtherProfile!
+  
+  getQuestions(userId: ID!, limit: Int!, nextToken: String): QuestionsPage!
+  
+  getLikes(userId: ID!, limit: Int!, nextToken:String):QuestionsPage!
+ 
+  getFollowers(userId:ID!, limit: Int!, nextToken: String) : ProfilesPage!
+
+  getFollowing(userId:ID!, limit: Int!, nextToken: String) : ProfilesPage!
+
+ }
+ type Mutation {
+  editMyProfile(newProfile: ProfileInput!): MyProfile!
+  question(content: String!): Question!
+  like(questionId: ID!): Boolean!
+  unlike(questionId: ID!): Boolean!
+  upvote(questionId: ID!): Boolean!
+  downvote(questionId: ID!): Boolean!
+
+  answer(questionId: ID!, content: String!): Answer!
+  
+  Comment(answerId: ID!, content: String!): Comment!
+
+ follow(userId: ID!): Boolean!
+ unfollow(userId: ID!): Boolean!
+ }
+ input ProfileInput{
+ name: String!
+ imageUrl: AWSURL
+ backgroundImageUrl: AWSURL
+ bio: String
+ location: String
+ website: AWSURL
+ birthdate: AWSDate
+ }
+
+interface IProfile {
+
+ id: ID!,
+ name: String!
+ screenName: String!
+ imageUrl: AWSURL
+ backgroundImageUrl: AWSURL
+ bio: String
+ location: String
+ website: AWSURL
+ birthdate: AWSDate
+ createdAt: AWSDateTime!
+ questions: QuestionsPage!
+ followersCount: Int!
+ followingCount: Int!
+ questionsCount: Int!
+ likesCount: Int!
+ 
+ }
+
+
+type MyProfile implements IProfile{
+ id: ID!,
+ name: String!
+ screenName: String!
+ imageUrl: AWSURL
+ backgroundImageUrl: AWSURL
+ bio: String
+ location: String
+ website: AWSURL
+ birthdate: AWSDate
+ createdAt: AWSDateTime!
+ questions: QuestionsPage!
+ followersCount: Int!
+ followingCount: Int!
+ questionsCount: Int!
+ likesCount: Int!
+}
+type OtherProfile implements IProfile {
+ id: ID!,
+ name: String!
+ screenName: String!
+ imageUrl: AWSURL
+ backgroundImageUrl: AWSURL
+ bio: String
+ location: String
+ website: AWSURL
+ birthdate: AWSDate
+ createdAt: AWSDateTime!
+ questions: QuestionsPage!
+ followersCount: Int!
+ followingCount: Int!
+ questionsCount: Int!
+ likesCount: Int!
+ following: Boolean!
+ followedByThem: Boolean;
+}
+
+interface IQuestion{
+ id: ID!
+ profile: IProfile!
+ createdAt: AWSDateTime!
+}
+
+type Question implements IQuestion{
+ id: ID!
+ profile: IProfile!
+ createdAt: AWSDateTime!
+ content: String!
+ answer: Int!
+ likes: Int!
+ upvote: Int!
+ downvote:Int! 
+ liked:Boolean
+}
+
+type Answer implements IQuestion {
+ id: ID!
+ profile: IProfile!
+ createdAt: AWSDateTime!
+ content: String!
+ inAnswerToQuestion: IQuestion!
+ inAnswerToUsers: [IProfile!]
+ answer: Int!
+ likes: Int!
+ upvote: Int!
+ downvote:Int! 
+ liked:Boolean
+}
+type Comment implements IQuestion {
+ id: ID!
+ profile: IProfile!
+ createdAt: AWSDateTime!
+ content: String!
+ inCommentToAnswer: Answer!
+ inCommentToUser: [IProfile!]
+ answer: Int!
+ likes: Int!
+ upvote: Int!
+ downvote:Int! 
+ liked:Boolean
+}
+
+type QuestionsPage{
+questions: [IQuestion!]
+nextToken: String
+}
+
+type ProfilesPage {
+ profile: [IProfile!]
+ nextToken: String
+}
